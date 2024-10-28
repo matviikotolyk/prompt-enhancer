@@ -4,10 +4,14 @@
   "version": "1.0",
   "description": "Improve prompts for Claude using Groq",
   "permissions": ["activeTab"],
-  "host_permissions": ["http://localhost:3000/*", "https://claude.ai/*"],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "https://claude.ai/*",
+    "https://chatgpt.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://claude.ai/*"],
+      "matches": ["https://claude.ai/*", "https://chatgpt.com/*"],
       "js": ["content.js"]
     }
   ],

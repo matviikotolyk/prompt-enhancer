@@ -1,10 +1,15 @@
 console.log("Claude Copilot Extension activated");
 
-function createCompareButton() {
+function createCompareButton(platform = "claude") {
   const button = document.createElement("button");
   button.textContent = "Improve prompt";
-  button.className =
-    "text-white rounded text-sm font-medium transition-colors inline-flex items-center justify-center relative shrink-0 ring-offset-2 ring-offset-bg-300 ring-accent-main-100 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:drop-shadow-none text-text-200 border-transparent transition-colors font-styrene active:bg-bg-400 hover:bg-bg-500/40 hover:text-text-100 h-8 rounded-md px-3 text-xs min-w-[4rem] active:scale-[0.985] whitespace-nowrap pl-2 pr-2.5 gap-1 !rounded-lg font-medium sm:text-sm groq-compare-button";
+  if (platform === "claude") {
+    button.className =
+      "text-white rounded text-sm font-medium transition-colors inline-flex items-center justify-center relative shrink-0 ring-offset-2 ring-offset-bg-300 ring-accent-main-100 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:drop-shadow-none text-text-200 border-transparent transition-colors font-styrene active:bg-bg-400 hover:bg-bg-500/40 hover:text-text-100 h-8 rounded-md px-3 text-xs min-w-[4rem] active:scale-[0.985] whitespace-nowrap pl-2 pr-2.5 gap-1 !rounded-lg font-medium sm:text-sm groq-compare-button";
+  } else if (platform === "chatgpt") {
+    button.className =
+      "relative flex h-[42px] mx-2 items-center gap-1.5 rounded-full border border-token-border-light px-3 py-2 text-start text-[13px] shadow-xxs transition enabled:hover:bg-token-main-surface-secondary disabled:cursor-not-allowed xl:gap-2 xl:text-[14px] text-gray-600 dark:text-gray-500 whitespace-nowrap groq-compare-button";
+  }
   return button;
 }
 
@@ -15,15 +20,22 @@ function createLoadingSpinner() {
   return spinner;
 }
 
-function createPromptComparison(originalPrompt, improvedPrompt) {
+function createPromptComparison(
+  originalPrompt,
+  improvedPrompt,
+  platform = "claude"
+) {
   // Overlay background with blur effect
   const overlay = document.createElement("div");
-  overlay.className = "fixed inset-0 bg-black backdrop-blur-sm";
-  overlay.style.cssText = "z-index: 999999; backdrop-filter: blur(4px);";
+  overlay.className = "fixed inset-0 bg-black/50";
+  overlay.style.cssText = "z-index: 999999;";
 
   const container = document.createElement("div");
-  container.className =
-    "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-b from-bg-200 to-bg-100 rounded-lg p-6 shadow-2xl w-[80vw] max-w-2xl";
+  container.className = `fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${
+    platform === "claude"
+      ? "bg-gradient-to-b from-bg-200 to-bg-100"
+      : "bg-token-main-surface-primary"
+  } rounded-lg p-6 shadow-2xl w-[80vw] max-w-2xl`;
   container.style.cssText = `
     z-index: 1000000; 
     max-height: 80vh;
@@ -71,19 +83,22 @@ function createPromptComparison(originalPrompt, improvedPrompt) {
   originalSection.className = "mb-4";
   originalSection.innerHTML = `
     <div class="text-sm text-gray-400 mb-2">Original Prompt:</div>
-    <div class="p-3 rounded bg-red-100/10 text-red-200 border border-red-500/20">${originalPrompt}</div>
+    <div class="p-3 rounded">${originalPrompt}</div>
   `;
 
   const improvedSection = document.createElement("div");
   improvedSection.className = "mb-4";
   improvedSection.innerHTML = `
     <div class="text-sm text-gray-400 mb-2">Improved Prompt:</div>
-    <div class="p-3 rounded bg-green-100/10 text-green-200 border border-green-500/20">${improvedPrompt}</div>
+    <div class="p-3 rounded">${improvedPrompt}</div>
   `;
 
   const acceptButton = document.createElement("button");
-  acceptButton.className =
-    "text-white rounded text-sm font-medium transition-colors inline-flex items-center justify-center relative shrink-0 ring-offset-2 ring-offset-bg-300 ring-accent-main-100 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:drop-shadow-none text-text-200 border-transparent transition-colors font-styrene active:bg-bg-400 hover:bg-bg-500/40 hover:text-text-100 h-8 rounded-md px-3 text-xs min-w-[4rem] active:scale-[0.985] whitespace-nowrap pl-2 pr-2.5 gap-1 !rounded-lg font-medium sm:text-sm groq-compare-button";
+  acceptButton.className = `${
+    platform === "claude"
+      ? "text-white rounded text-sm font-medium transition-colors inline-flex items-center justify-center relative shrink-0 ring-offset-2 ring-offset-bg-300 ring-accent-main-100 focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:drop-shadow-none text-text-200 border-transparent transition-colors font-styrene active:bg-bg-400 hover:bg-bg-500/40 hover:text-text-100 h-8 rounded-md px-3 text-xs min-w-[4rem] active:scale-[0.985] whitespace-nowrap pl-2 pr-2.5 gap-1 !rounded-lg font-medium sm:text-sm"
+      : "relative flex h-[42px] mx-2 items-center gap-1.5 rounded-full border border-token-border-light px-3 py-2 text-start text-[13px] shadow-xxs transition enabled:hover:bg-token-main-surface-secondary disabled:cursor-not-allowed xl:gap-2 xl:text-[14px] text-gray-600 dark:text-gray-500 whitespace-nowrap"
+  }`;
   acceptButton.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -137,6 +152,8 @@ function updateInput(inputDiv, newText) {
 }
 
 async function handleCompareClick(event) {
+  const platform =
+    window.location.hostname === "chatgpt.com" ? "chatgpt" : "claude";
   const button = event.target;
   const inputDiv = getInputDiv();
   if (!inputDiv) {
@@ -172,7 +189,8 @@ async function handleCompareClick(event) {
 
     const { overlay, container, acceptButton } = createPromptComparison(
       currentText,
-      data.improvedPrompt
+      data.improvedPrompt,
+      platform
     );
 
     acceptButton.addEventListener("click", () => {
@@ -201,25 +219,41 @@ function initializeExtension() {
   console.log("Initializing Claude Copilot Extension");
 
   const addButton = () => {
-    let inputContainer = document.querySelector(
-      ".flex.min-w-0.items-center.gap-0\\.5"
-    );
-    if (!inputContainer) {
-      inputContainer = document.querySelector(
-        ".cursor-pointer.hover\\:bg-bg-100.text-xs.text-text-500"
-      );
-    }
+    const platform =
+      window.location.hostname === "claude.ai" ? "claude" : "chatgpt";
 
-    if (!inputContainer) {
+    if (document.querySelector(".groq-compare-button")) {
       return;
     }
 
-    // Check if button already exists
-    if (!document.querySelector(".groq-compare-button")) {
-      const button = createCompareButton();
-      inputContainer.insertAdjacentElement("afterend", button);
-      button.addEventListener("click", handleCompareClick);
-      console.log("Button added");
+    if (platform === "claude") {
+      let inputContainer = document.querySelector(
+        ".flex.min-w-0.items-center.gap-0\\.5"
+      );
+      if (!inputContainer) {
+        inputContainer = document.querySelector(
+          ".cursor-pointer.hover\\:bg-bg-100.text-xs.text-text-500"
+        );
+      }
+
+      // Check if button already exists
+      if (!document.querySelector(".groq-compare-button")) {
+        const button = createCompareButton("claude");
+        inputContainer.insertAdjacentElement("afterend", button);
+        button.addEventListener("click", handleCompareClick);
+        console.log("Claude button added");
+      }
+    } else {
+      const targetDiv = document.querySelector(
+        ".flex.w-full.flex-col.transition-colors.contain-inline-size.gap-1\\.5.rounded-\\[26px\\].p-1\\.5.bg-\\[\\#f4f4f4\\].dark\\:bg-token-main-surface-secondary"
+      );
+      // Check if button already exists
+      if (targetDiv && !document.querySelector(".groq-compare-button")) {
+        const button = createCompareButton("chatgpt");
+        targetDiv.parentNode.insertBefore(button, targetDiv.nextSibling);
+        button.addEventListener("click", handleCompareClick);
+        console.log("ChatGPT button added");
+      }
     }
   };
 
@@ -251,7 +285,10 @@ function initializeExtension() {
   });
 }
 
-if (window.location.hostname === "claude.ai") {
+if (
+  window.location.hostname === "claude.ai" ||
+  window.location.hostname === "chatgpt.com"
+) {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializeExtension);
   } else {
